@@ -6,14 +6,6 @@ defmodule SurrealEx.Config do
             _prepare: %{}
 
 
-  def env_reads() do
-    # Design note:
-    #   I would like that the devs will be able to define multiple connections
-    #   then this will move it.
-    #
-    env_config = Application.get_env(:surreal_ex, __MODULE__)
-    env_reads(env_config)
-  end
   def env_reads(env_config) do
     case env_config[:interface] do
       :http -> for_http(env_config)

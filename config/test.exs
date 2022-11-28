@@ -1,6 +1,6 @@
 import Config
 
-config :surreal_ex, SurrealEx.Config,
+config :surreal_ex, SurrealExTest.Conn,
   interface: :http,
   uri: "http://localhost:8000",
   ns: "testns",

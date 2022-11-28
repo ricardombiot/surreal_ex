@@ -25,4 +25,9 @@ defmodule SurrealEx.Exception do
     raise SurrealEx.Exception, message: message
   end
 
+
+  def query_should_be_string() do
+    raise SurrealEx.Exception, message: "query should be string."
+  end
+
 end

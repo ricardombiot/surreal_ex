@@ -20,13 +20,13 @@ defmodule SurrealEx.Config do
   defp conn_env_config(module) do
     env_config = Application.get_env(:surreal_ex, module)
 
-    case SurrealEx.Config.env_reads(env_config) do
+    case env_reads(env_config) do
       nil -> SurrealEx.Exception.exception_config_file_should_be_edited(module)
       config -> config
     end
   end
 
-  def env_reads(env_config) do
+  defp env_reads(env_config) do
     case env_config[:interface] do
       :http -> for_http(env_config)
       _ -> nil

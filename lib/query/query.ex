@@ -9,19 +9,11 @@ defmodule SurrealEx.Query do
   defmacro __using__(opts) do
     conn_module = Keyword.get(opts, :conn)
 
-    [
-      build_base(conn_module)
-    ]
-    |> List.flatten()
-  end
-
-  defp build_base(conn_module) do
-    quote bind_quoted: [
-      conn_module: conn_module]
+    quote bind_quoted: [conn_module: conn_module]
     do
 
       def run(args) do
-        SurrealEx.Query.QueryFlowRunner.run(__MODULE__, conn_module, args)
+        SurrealEx.Query.QueryFlowRunner.run(__MODULE__, unquote(conn_module), args)
       end
 
     end

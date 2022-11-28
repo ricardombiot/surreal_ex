@@ -1,22 +1,20 @@
-defmodule DesignSQLSintaxTest do
+defmodule SurrealExTest.DesignSQLSintax.UsingEnvConfigTest do
   use ExUnit.Case
 
   setup_all do
-    SurrealEx.Config.for_http("http://localhost:8000","surrealex_test","surrealex_test","root","root")
-    |> SurrealEx.sql("REMOVE TABLE team")
+    SurrealEx.sql("REMOVE TABLE team")
     |> SurrealEx.when_ok_sql("REMOVE TABLE player")
-    |> SurrealEx.when_ok(fn _res, config ->
-      [config: config]
-    end)
+
+    :ok
   end
 
 
-  test "Creating twice the same example record and we expect catch the error", state do
+  test "Creating twice the same example record and we expect catch the error", _state do
     query = "CREATE team:valenciacf SET fullname = 'Valencia Club de Fútbol, S.A.D.', shortname = 'Valencia', founded = 1919, league = 'La Liga';"
 
     # How the list of responses will only have one element, we catch and return it.
-    # Why? -> Avoid this syntax: {:ok, [response], _config} = SurrealEx.sql(state.config, query)
-    {:ok, response, _config} = SurrealEx.sql(state.config, query)
+    # Why? -> Avoid this syntax: {:ok, [response]} = SurrealEx.sql(query)
+    {:ok, response} = SurrealEx.sql(query)
     assert response.status == "OK"
     assert response.detail == nil
 
@@ -30,7 +28,7 @@ defmodule DesignSQLSintaxTest do
     assert response.result["founded"] == 1919
     assert response.result["league"] == "La Liga"
 
-    {:ok, response, _config} = SurrealEx.sql(state.config, query)
+    {:ok, response} = SurrealEx.sql(query)
     assert response.status == "ERR"
     assert response.detail == "Database record `team:valenciacf` already exists"
 
@@ -39,16 +37,16 @@ defmodule DesignSQLSintaxTest do
   end
 
 
-  test "Creating two example records and we expect can find them.", state do
+  test "Creating two example records and we expect can find them.", _state do
     query = """
       CREATE player:Messi SET fullname = 'Lionel Andrés Messi', shortname = 'Messi', nationality = 'Argentine';
       CREATE player:CR7 SET fullname = 'Cristiano Ronaldo', shortname = 'CR7', nationality = 'Portuguese', age = 37;
     """
 
-    {:ok, list_responses, _config} = SurrealEx.sql(state.config, query)
+    {:ok, list_responses} = SurrealEx.sql(query)
     assert SurrealEx.Response.all_status_ok?(list_responses)
 
-    {:ok, response, _config} = SurrealEx.sql(state.config, "SELECT * FROM player ORDER BY age DESC")
+    {:ok, response} = SurrealEx.sql("SELECT * FROM player ORDER BY age DESC")
     [response_cr7, response_messi] = response.result
 
     assert response_messi["id"] == "player:Messi"

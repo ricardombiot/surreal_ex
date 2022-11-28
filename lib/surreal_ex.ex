@@ -11,56 +11,52 @@ defmodule SurrealEx do
     |> when_ok(..callback..)
     |> when_error(..callback..)
 
-  But I dont like this implementation because its a bit dirty had to pipe the config
-  with a 3-tuple.
-
-  @TODO: Save the configuration on a config/config.exs files.
-
   """
 
   alias SurrealEx.Response
 
+  def sql(query) when is_bitstring(query) do
+    SurrealEx.Config.env_reads()
+    |> sql(query)
+  end
   def sql(config = %SurrealEx.Config{kind: :for_http}, query) do
     SurrealEx.HTTP.sql(config, query)
-    |> answer_for_pipe(config)
+    |> if_only_one_response_catchit()
   end
   def sql(_config , _query) do
     {:error, "Please, review your configuration %SurrealEx.Config{...}."}
   end
 
-
-  defp answer_for_pipe({:ok, [response]}, config) do
-    {:ok, response, config}
+  defp if_only_one_response_catchit({:ok, [response]}) do
+    {:ok, response}
   end
-  defp answer_for_pipe({:ok, responses}, config) do
-    {:ok, responses, config}
-  end
+  defp if_only_one_response_catchit(res), do: res
 
 
-  def when_ok({:ok, responses, config}, fn_callback_ok) do
+  def when_ok({:ok, responses}, fn_callback_ok) do
     case Response.all_status_ok?(responses) do
-      true -> fn_callback_ok.(responses, config)
-      _ -> {:ok, responses, config}
+      true -> fn_callback_ok.(responses)
+      _ -> {:ok, responses}
     end
   end
   def when_ok(res,_query), do: res
 
 
-  def when_error({:error, responses, config}, fn_callback_error) do
-    fn_callback_error.(responses, config)
+  def when_error({:error, responses}, fn_callback_error) do
+    fn_callback_error.(responses)
   end
-  def when_error({:ok, responses, config}, fn_callback_error) do
+  def when_error({:ok, responses}, fn_callback_error) do
     case Response.all_status_ok?(responses) do
-      false -> fn_callback_error.(responses, config)
-      _ -> {:ok, responses, config}
+      false -> fn_callback_error.(responses)
+      _ -> {:ok, responses}
     end
   end
   def when_error(res,_query), do: res
 
 
   def when_ok_sql(res, query) do
-    when_ok(res, fn _res, config ->
-      sql(config, query)
+    when_ok(res, fn _res ->
+      sql(query)
     end)
   end
 

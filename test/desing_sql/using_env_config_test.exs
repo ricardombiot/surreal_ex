@@ -33,8 +33,6 @@ defmodule SurrealExTest.DesignSQLSintax.UsingEnvConfigTest do
     assert response.status == "ERR"
     assert response.detail == "Database record `team:valenciacf` already exists"
 
-
-    ## DELETE RECORD
   end
 
 

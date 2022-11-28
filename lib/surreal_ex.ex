@@ -20,30 +20,12 @@ defmodule SurrealEx do
       alias SurrealEx.Response
 
       def config() do
-        # Design note:
-        #   [X] We can have multiple connections.
-        #   [X] Customize config with dynamic values, using configuration at PID level.
-        #
-        case Process.get(:conn_config, nil) do
-          nil -> conn_env_config()
-          config -> config
-        end
+        SurrealEx.Config.get_config(__MODULE__)
       end
-
 
       def set_config_pid(config) do
         SurrealEx.Config.set_config_pid(config)
       end
-
-      defp conn_env_config() do
-        env_config = Application.get_env(:surreal_ex, __MODULE__)
-
-        case SurrealEx.Config.env_reads(env_config) do
-          nil -> SurrealEx.Exception.exception_config_file_should_be_edited(__MODULE__)
-          config -> config
-        end
-      end
-
 
       def sql(query) when is_bitstring(query) do
         config()

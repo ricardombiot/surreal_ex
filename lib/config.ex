@@ -6,6 +6,26 @@ defmodule SurrealEx.Config do
             _prepare: %{}
 
 
+  def get_config(module) do
+      # Design note:
+      #   [X] We can have multiple connections.
+      #   [X] Customize config with dynamic values, using configuration at PID level.
+      #
+      case Process.get(:conn_config, nil) do
+        nil -> conn_env_config(module)
+        config -> config
+      end
+  end
+
+  defp conn_env_config(module) do
+    env_config = Application.get_env(:surreal_ex, module)
+
+    case SurrealEx.Config.env_reads(env_config) do
+      nil -> SurrealEx.Exception.exception_config_file_should_be_edited(module)
+      config -> config
+    end
+  end
+
   def env_reads(env_config) do
     case env_config[:interface] do
       :http -> for_http(env_config)

@@ -15,6 +15,11 @@ defmodule SurrealEx.Exception do
                     interface: ...
                     ...
               ...
+
+              Or writes your custom configuration on PID:
+
+                #{module_str}.set_config_pid(config)
+
               #######
               """
     raise SurrealEx.Exception, message: message

@@ -22,11 +22,20 @@ defmodule SurrealEx do
       def config() do
         # Design note:
         #   [X] We can have multiple connections.
-        #   But what happend when we will needed use for example user tokens.
-        #   [ ] Customize config with dynamic values.
-        #    |--> Idea: If each user is on a pid, we can use Process.get(:config, config())
+        #   [X] Customize config with dynamic values, using configuration at PID level.
         #
-        #
+        case Process.get(:conn_config, nil) do
+          nil -> conn_env_config()
+          config -> config
+        end
+      end
+
+
+      def set_config_pid(config) do
+        SurrealEx.Config.set_config_pid(config)
+      end
+
+      defp conn_env_config() do
         env_config = Application.get_env(:surreal_ex, __MODULE__)
 
         case SurrealEx.Config.env_reads(env_config) do
@@ -34,6 +43,7 @@ defmodule SurrealEx do
           config -> config
         end
       end
+
 
       def sql(query) when is_bitstring(query) do
         config()

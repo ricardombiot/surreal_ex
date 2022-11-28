@@ -13,6 +13,10 @@ defmodule SurrealEx.Config do
     end
   end
 
+  def set_config_pid(config) do
+    Process.put(:conn_config, config)
+  end
+
   @doc ~S"""
   Prepare connection configuration for HTTP with Basic Authorization
 

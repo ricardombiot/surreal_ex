@@ -5,6 +5,18 @@ defmodule SurrealEx.Config do
             db: "",
             _prepare: %{}
 
+
+  def env_reads(env_config) do
+    case env_config[:interface] do
+      :http -> for_http(env_config)
+      _ -> nil
+    end
+  end
+
+  def set_config_pid(config) do
+    Process.put(:conn_config, config)
+  end
+
   @doc ~S"""
   Prepare connection configuration for HTTP with Basic Authorization
 
@@ -34,8 +46,11 @@ defmodule SurrealEx.Config do
 
 
   """
-  def for_http(uri, ns, db, username, password) do
-    basic_auth = Base.encode64("#{username}:#{password}")
+  def for_http(env_config) do
+    for_http(env_config[:uri], env_config[:ns], env_config[:db], env_config[:user], env_config[:pass])
+  end
+  def for_http(uri, ns, db, user, pass) do
+    basic_auth = Base.encode64("#{user}:#{pass}")
     prepare_conn = %{
         headers: [
           "NS": ns,

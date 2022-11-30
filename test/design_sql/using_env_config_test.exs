@@ -2,7 +2,7 @@ defmodule SurrealExTest.DesignSQLSintax.UsingEnvConfigTest do
   use ExUnit.Case
 
   alias SurrealExTest.Conn
-  setup_all do
+  setup do
     Conn.sql("REMOVE TABLE team")
     |> Conn.when_ok_sql("REMOVE TABLE player")
 
@@ -46,19 +46,25 @@ defmodule SurrealExTest.DesignSQLSintax.UsingEnvConfigTest do
     assert SurrealEx.Response.all_status_ok?(list_responses)
 
     {:ok, response} = Conn.sql("SELECT * FROM player ORDER BY age DESC")
+    response = SurrealEx.Response.to_dot_syntax(response)
     [response_cr7, response_messi] = response.result
 
-    assert response_messi["id"] == "player:Messi"
-    assert response_messi["fullname"] == "Lionel Andrés Messi"
-    assert response_messi["shortname"] == "Messi"
-    assert response_messi["nationality"] == "Argentine"
-    assert response_messi["age"] == nil
+    assert response_messi.id == "player:Messi"
+    assert response_messi.fullname == "Lionel Andrés Messi"
+    assert response_messi.shortname == "Messi"
+    assert response_messi.nationality == "Argentine"
+    # I dont like that with .dot sintax we can have errors
+    #   - if we trust that obj always have all the fields... mmm...
+    # Example:
+    #  assert response_messi.age == nil <-- throws error
+    #
+    assert response_messi[:age] == nil
 
-    assert response_cr7["id"] == "player:CR7"
-    assert response_cr7["fullname"] == "Cristiano Ronaldo"
-    assert response_cr7["shortname"] == "CR7"
-    assert response_cr7["nationality"] == "Portuguese"
-    assert response_cr7["age"] == 37
+    assert response_cr7.id == "player:CR7"
+    assert response_cr7.fullname == "Cristiano Ronaldo"
+    assert response_cr7.shortname == "CR7"
+    assert response_cr7.nationality == "Portuguese"
+    assert response_cr7.age == 37
 
   end
 

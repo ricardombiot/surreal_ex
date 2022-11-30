@@ -14,6 +14,15 @@ defmodule SurrealEx.Response do
     }
   end
 
+  # Design decision cast maps to dot syntax ¿?
+  def to_dot_syntax(list_response) when is_list(list_response) do
+    list_response
+    |> Enum.map(&to_dot_syntax/1)
+  end
+  def to_dot_syntax(response = %SurrealEx.Response{}) do
+    result = UtilsJsonParser.map_strkeys_to_atomkeys(response.result)
+    Map.put(response, :result, result)
+  end
 
   defp field_result(result) when is_list(result) do
     case Enum.count(result) do

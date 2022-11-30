@@ -1,5 +1,11 @@
 defmodule SurrealExTest.DesignQueries.ExampleFlow do
 
+  def filters(_args) do
+    [
+      ArgsChecker.required(:price_max)
+    ]
+  end
+
   def before(args) do
     # Logical checks
 

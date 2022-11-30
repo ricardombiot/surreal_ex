@@ -1,4 +1,4 @@
-defmodule SurrealExTest.QueryTest do
+defmodule SurrealExTest.QueryFiltersTest do
   use ExUnit.Case
 
   defmodule Conn do
@@ -7,15 +7,14 @@ defmodule SurrealExTest.QueryTest do
 
   defmodule ExampleFlow do
     use SurrealEx.Query,
-      conn: SurrealExTest.QueryTest.Conn
+      conn: SurrealExTest.QueryFiltersTest.Conn
 
-    def before(args) do
-      # Logical checks
-      cond do
-        args[:price_max] == nil -> {:error, "price_max required"}
-        !is_number(args[:price_max]) -> {:error, "price_max should be number"}
-        true -> {:ok, args}
-      end
+    def filters(_args) do
+      [
+        ArgsChecker.required(:price_max),
+        ArgsChecker.should_be(:price_max, :float),
+        ArgsChecker.greater_than(:price_max, 0.0)
+      ]
     end
 
     def query(args) do
@@ -48,14 +47,21 @@ defmodule SurrealExTest.QueryTest do
     args = %{}
     {:error, detail} = ExampleFlow.run(args)
 
-    assert detail == "price_max required"
+    assert detail == [
+      "'price_max' is required",
+      "'price_max' should be float",
+      "'price_max' should be greater than 0.0"
+    ]
 
     args = %{
       price_max: "15000.00"
     }
     {:error, detail} = ExampleFlow.run(args)
 
-    assert detail == "price_max should be number"
+    assert detail == [
+      "'price_max' should be float",
+      "'price_max' should be greater than 0.0"
+    ]
   end
 
   test "Simple query testing" do

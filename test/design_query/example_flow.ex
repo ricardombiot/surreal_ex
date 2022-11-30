@@ -1,3 +1,6 @@
+##
+## ONLY DESIGN FILE
+##
 defmodule SurrealExTest.DesignQueries.ExampleFlow do
 
   def filters(_args) do

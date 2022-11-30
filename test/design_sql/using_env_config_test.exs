@@ -2,7 +2,7 @@ defmodule SurrealExTest.DesignSQLSintax.UsingEnvConfigTest do
   use ExUnit.Case
 
   alias SurrealExTest.Conn
-  setup_all do
+  setup do
     Conn.sql("REMOVE TABLE team")
     |> Conn.when_ok_sql("REMOVE TABLE player")
 

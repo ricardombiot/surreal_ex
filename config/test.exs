@@ -16,3 +16,11 @@ config :surreal_ex, SurrealExTest.QueryTest.Conn,
   db: "testdb",
   user: "root",
   pass: "root"
+
+config :surreal_ex, SurrealExTest.QueryFiltersTest.Conn,
+  interface: :http,
+  uri: "http://localhost:8000",
+  ns: "testns",
+  db: "testdb",
+  user: "root",
+  pass: "root"

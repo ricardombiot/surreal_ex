@@ -1,12 +1,28 @@
 defmodule SurrealEx.Query.QueryFlowRunner do
 
   def run(module, conn_module, args) do
-    case optional_before(module, args) do
-      {:ok, query_args} ->
-        prepare_query(module, query_args)
-        |> exe_query(conn_module)
-        |> optional_after(module)
-      output -> output
+    optional_filters(module, args)
+    |> flow_optional_before(module)
+    |> flow_query(module, conn_module)
+  end
+
+  defp flow_optional_before({:ok, args}, module), do: optional_before(module, args)
+  defp flow_optional_before(err, _module), do: err
+
+  defp flow_query({:ok, query_args}, module, conn_module) do
+    prepare_query(module, query_args)
+    |> exe_query(conn_module)
+    |> optional_after(module)
+  end
+  defp flow_query(err, _module, _conn_module), do: err
+
+
+  defp optional_filters(module, args) do
+    if Kernel.function_exported?(module, :filters, 1) do
+      filters = apply(module, :filters, [args])
+      SurrealEx.ArgsChecker.apply(args, filters)
+    else
+      {:ok, args}
     end
   end
 

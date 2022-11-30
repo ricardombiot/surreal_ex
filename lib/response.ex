@@ -14,11 +14,20 @@ defmodule SurrealEx.Response do
     }
   end
 
+  def to_dot_sintax(response = %SurrealEx.Response{}) do
+    result = response.result
+      |> UtilsJsonParser.map_strkeys_to_atomkeys()
 
+    Map.put(response, :result, result)
+  end
+
+  # Design decision cast maps to dot syntax ¿?
   defp field_result(result) when is_list(result) do
     case Enum.count(result) do
       1 -> List.first(result)
+        |> UtilsJsonParser.map_strkeys_to_atomkeys()
       _ -> result
+        |> Enum.map(&UtilsJsonParser.map_strkeys_to_atomkeys/1)
     end
   end
   defp field_result(nil), do: []

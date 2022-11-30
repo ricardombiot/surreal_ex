@@ -70,7 +70,7 @@ defmodule SurrealExTest.QueryFiltersTest do
     }
     {:ok, list_cars} = ExampleFlow.run(args)
 
-    assert Enum.map(list_cars, fn car -> car.price <= 15000 end)
+    assert Enum.map(list_cars, fn car -> car["price"] <= 15000 end)
       |> Enum.all?
   end
 

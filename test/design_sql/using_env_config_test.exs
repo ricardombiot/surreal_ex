@@ -23,11 +23,11 @@ defmodule SurrealExTest.DesignSQLSintax.UsingEnvConfigTest do
     # Why? -> This will allow us work easily with the result object.
     assert !is_list(response.result)
 
-    assert response.result.id == "team:valenciacf"
-    assert response.result.fullname == "Valencia Club de Fútbol, S.A.D."
-    assert response.result.shortname == "Valencia"
-    assert response.result.founded == 1919
-    assert response.result.league == "La Liga"
+    assert response.result["id"] == "team:valenciacf"
+    assert response.result["fullname"] == "Valencia Club de Fútbol, S.A.D."
+    assert response.result["shortname"] == "Valencia"
+    assert response.result["founded"] == 1919
+    assert response.result["league"] == "La Liga"
 
     {:ok, response} = Conn.sql(query)
     assert response.status == "ERR"
@@ -46,14 +46,18 @@ defmodule SurrealExTest.DesignSQLSintax.UsingEnvConfigTest do
     assert SurrealEx.Response.all_status_ok?(list_responses)
 
     {:ok, response} = Conn.sql("SELECT * FROM player ORDER BY age DESC")
+    response = SurrealEx.Response.to_dot_syntax(response)
     [response_cr7, response_messi] = response.result
 
     assert response_messi.id == "player:Messi"
     assert response_messi.fullname == "Lionel Andrés Messi"
     assert response_messi.shortname == "Messi"
     assert response_messi.nationality == "Argentine"
-    # I dont like that with .dot sintax we can have error
-    #   - if we trust that obj always have all the fields... then...
+    # I dont like that with .dot sintax we can have errors
+    #   - if we trust that obj always have all the fields... mmm...
+    # Example:
+    #  assert response_messi.age == nil <-- throws error
+    #
     assert response_messi[:age] == nil
 
     assert response_cr7.id == "player:CR7"

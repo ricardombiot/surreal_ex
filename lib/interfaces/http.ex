@@ -1,6 +1,7 @@
 defmodule SurrealEx.HTTP do
 
   alias SurrealEx.HTTPResponse
+  alias SurrealEx.Response
 
   def sql(config, query) do
     url = "#{config.uri}/sql"
@@ -18,6 +19,7 @@ defmodule SurrealEx.HTTP do
 
     HTTPoison.get(url, headers, options)
     |> HTTPResponse.build()
+    |> response_to_dot()
     |> response_get()
   end
 
@@ -41,6 +43,7 @@ defmodule SurrealEx.HTTP do
 
     HTTPoison.post(url, body, headers, options)
     |> HTTPResponse.build()
+    |> response_to_dot()
     |> response_create()
   end
 
@@ -62,6 +65,7 @@ defmodule SurrealEx.HTTP do
 
     HTTPoison.put(url, body, headers, options)
     |> HTTPResponse.build()
+    |> response_to_dot()
     |> response_put()
   end
 
@@ -83,6 +87,7 @@ defmodule SurrealEx.HTTP do
 
     HTTPoison.patch(url, body, headers, options)
     |> HTTPResponse.build()
+    |> response_to_dot()
     |> response_update()
   end
 
@@ -116,5 +121,12 @@ defmodule SurrealEx.HTTP do
     end
   end
   defp response_delete(err), do: err
+
+
+  defp response_to_dot({:ok, [response]}) do
+    response = Response.to_dot_syntax(response)
+    {:ok, [response]}
+  end
+  defp response_to_dot(other), do: other
 
 end

@@ -2,12 +2,11 @@ defmodule SurrealEx.Query do
 
   # Gives a filter´s list functions than will let us validate the args before prepare to query.
   @callback filters(arg :: any) :: [(any() -> {:ok, nil} | {:error, bitstring()})]
-
   @callback before(arg :: any) :: {:ok, any()} | {:error, any()}
   @callback query(arg :: any) :: String.t()
   @callback ok(response :: any) :: any()
   @callback error(response :: any) :: any()
-  @optional_callbacks before: 1, ok: 1, error: 1, filters: 1
+  @optional_callbacks filters: 1, before: 1, ok: 1, error: 1
 
   defmacro __using__(opts) do
     conn_module = Keyword.get(opts, :conn)

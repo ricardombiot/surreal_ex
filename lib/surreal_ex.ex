@@ -5,6 +5,7 @@ defmodule SurrealEx do
   Design Notes: It is interesting can pipe actions (even diferente SQLs) and
   can control easily the flow depending if the database answer was sucessfully or not.
 
+
     config
     |> sql(..query..)
     |> when_ok_sql(..query..)

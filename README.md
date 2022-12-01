@@ -2,7 +2,6 @@
 
 Surreal DB Elixir Library.
 
-
 ## Installation
 
 ```elixir
@@ -19,7 +18,7 @@ Define a connector file for your project:
  
 ```elixir
 defmodule SurrealExTest.Conn do
-  use SurrealEx
+  use SurrealEx.Conn
 end
 ```
 

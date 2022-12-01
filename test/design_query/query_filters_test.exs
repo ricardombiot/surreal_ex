@@ -2,7 +2,7 @@ defmodule SurrealExTest.QueryFiltersTest do
   use ExUnit.Case
 
   defmodule Conn do
-    use SurrealEx
+    use SurrealEx.Conn
   end
 
   defmodule ExampleFlow do

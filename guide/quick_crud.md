@@ -14,7 +14,7 @@ defmodule SurrealExTest.CRUDHttp.TableTest do
   use ExUnit.Case
 
   defmodule Conn do
-    use SurrealEx
+    use SurrealEx.Conn
   end
 
   defmodule TableBook do

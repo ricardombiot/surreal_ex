@@ -1,9 +1,9 @@
 defmodule SurrealExTest.Conn do
-  use SurrealEx
+  use SurrealEx.Conn
 end
 
 defmodule SurrealExTest.ConnNotConfig do
-  use SurrealEx
+  use SurrealEx.Conn
 end
 
 ExUnit.start()

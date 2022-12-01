@@ -69,6 +69,7 @@ defmodule SurrealExTest.CRUDHttp.TableTest do
     assert book.publication_date == favorite_book.publication_date
 
   end
+```
 
 ```elixir
   test "Create & Read & Update & Delete", _state do

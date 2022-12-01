@@ -82,10 +82,13 @@ Using your connector you can execute a queries for example:
   end
 ```
 
-(See more on our docs.)
+[(Learn more on our docs.)](https://hexdocs.pm/surreal_ex/quick_crud.html)
 
 ## Custom Queries
 
 ![custom_query_execution_flow](https://user-images.githubusercontent.com/113306658/205117894-a48c577d-3254-4536-b1b5-7c190eef73c9.jpg)
 
-(See more on our docs.)
+[(Learn more on our docs.)](https://hexdocs.pm/surreal_ex/custom_queries.html)
+
+
+

@@ -2,17 +2,19 @@
 
 ![alt text](assets/custom_query_execution_flow.jpg)
 
-- **Filtering (Optional)**:   
-`@callback filters(arg :: any) :: [(any() -> {:ok, nil} | {:error, bitstring()})]`
-During filtering we apply over input a list of functions `(any() -> {:ok, nil} | {:error, bitstring()})` that will take the input arguments and will return :ok, or :error with error message. 
-*Only in case all the the filters will fails then will start before stage.*
-- **Before (Optional)**:
-`  @callback before(arg :: any) :: {:ok, any()} | {:error, any()}`
-On before, we can prepare the arguments that will needed the query, and also we can avoid the execution returning `{:error, ...}`.
-*Only in case that before stage returns `{:ok, args}`, the flows will execute the query.*
-- **Query:**
- ` @callback query(arg :: any) :: String.t()`
-On query method we can focus on write our Surreal DB SQL.
+- **Filtering (Optional)**: `@callback filters(arg :: any) :: [(any() -> {:ok, nil} | {:error, bitstring()})]`
+  
+  During filtering we apply over input a list of functions `(any() -> {:ok, nil} | {:error, bitstring()})` that will take the input arguments and will return :ok, or :error with error message. 
+
+  *Only in case all the the filters will fails (i.e. all will answers with {:ok, ...}) then will start before stage.*
+- **Before (Optional)**: `@callback before(arg :: any) :: {:ok, any()} | {:error, any()}` 
+
+  On before, we can prepare the arguments that will needed the query, and also we can avoid the execution returning `{:error, ...}`.
+  
+  *Only in case that before stage returns `{:ok, args}`, the flows will execute the query.*
+- **Query:** ` @callback query(arg :: any) :: String.t()`
+ 
+  On query method we can focus on write our Surreal DB SQL.
 
 
 - **After (Optional)**:   

@@ -4,7 +4,7 @@ defmodule SurrealEx.MixProject do
   def project do
     [
       app: :surreal_ex,
-      version: "0.1.0",
+      version: "0.1.0-dev",
       elixir: "~> 1.12",
       description: description(),
       package: package(),
@@ -59,6 +59,7 @@ defmodule SurrealEx.MixProject do
         "mix.exs",
         "README.md",
       ],
+      licenses: ["MIT"]
       links: %{"GitHub" => "https://github.com/ricardombiot/surreal_ex"}
     ]
   end

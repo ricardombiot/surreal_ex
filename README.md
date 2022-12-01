@@ -7,7 +7,7 @@ Surreal DB Elixir Library.
 ```elixir
 def deps do
   [
-    {:surreal_ex, "~> 0.1.0"}
+    {:surreal_ex, "~> 0.1.0-dev"}
   ]
 end
 ```

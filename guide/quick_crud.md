@@ -9,7 +9,7 @@ The configuration requires the following arguments:
 
 ## Configuration example
 
-```
+```elixir
 defmodule SurrealExTest.CRUDHttp.TableTest do
   use ExUnit.Case
 
@@ -21,13 +21,22 @@ defmodule SurrealExTest.CRUDHttp.TableTest do
     use SurrealEx.HTTP.Table,
       conn: SurrealExTest.CRUDHttp.TableTest.Conn,
       table: "book"
+
+      # It will allow you use the following methods:
+      #
+      # get(id) 
+      # create(obj)
+      # put(id, obj)
+      # update(id, obj)
+      # delete(id)
+      
   end
 
 ```
 
 ## Usage example
 
-```
+```elixir
   test "Creating item with autogen_id & custom id", _state do
     favorite_book = %{
       isbn: "0-7167-1045-5",
@@ -61,7 +70,7 @@ defmodule SurrealExTest.CRUDHttp.TableTest do
 
   end
 
-```
+```elixir
   test "Create & Read & Update & Delete", _state do
     favorite_book = %{
       isbn: "9780511804090",

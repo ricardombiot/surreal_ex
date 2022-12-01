@@ -23,7 +23,7 @@ On query method we can focus on write our Surreal DB SQL.
    In case the execution will be unsuccess for all the responses (internally we used `SurrealEx.Response.all_status_ok?/1`) the flow will execute `error(response)`.
 
 ## Example 
-```
+```elixir
   defmodule ExampleFlow do
     use SurrealEx.Query,
       conn: SurrealExTest.QueryFiltersTest.Conn
@@ -59,7 +59,7 @@ On query method we can focus on write our Surreal DB SQL.
 
 Filtering process return us, string errors.
 
-```
+```elixir
   test "We expected that on before function checks args." do
     args = %{}
     {:error, detail} = ExampleFlow.run(args)

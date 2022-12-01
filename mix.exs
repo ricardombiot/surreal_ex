@@ -14,7 +14,10 @@ defmodule SurrealEx.MixProject do
       source_url: "https://github.com/ricardombiot/SurrealEx",
       docs: [
         main: "SurrealEx", # The main page in the docs
-        extras: ["README.md", "guide/custom_queries.md", "guide/quick_crud.md"],
+        extras: ["README.md",
+          "guide/quick_crud.md",
+          "guide/custom_queries.md"
+        ],
         assets: "guide/assets"
       ]
     ]

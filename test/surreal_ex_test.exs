@@ -1,8 +1,7 @@
 defmodule SurrealExTest do
   use ExUnit.Case
-  doctest SurrealEx
+  doctest SurrealEx.Conn
   doctest SurrealEx.Config
-
   doctest SurrealEx.Response
 
 end

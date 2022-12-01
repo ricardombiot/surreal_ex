@@ -15,7 +15,7 @@ defmodule SurrealEx.MixProject do
       name: "SurrealEx",
       source_url: "https://github.com/ricardombiot/surreal_ex",
       docs: [
-        main: "SurrealEx", # The main page in the docs
+        main: "readme", # The main page in the docs
         extras: ["README.md",
           "guide/quick_crud.md",
           "guide/custom_queries.md"
@@ -59,7 +59,7 @@ defmodule SurrealEx.MixProject do
         "mix.exs",
         "README.md",
       ],
-      licenses: ["MIT"]
+      licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/ricardombiot/surreal_ex"}
     ]
   end

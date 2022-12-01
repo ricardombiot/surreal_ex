@@ -1,2 +1,0 @@
-defmodule SurrealEx do
-end

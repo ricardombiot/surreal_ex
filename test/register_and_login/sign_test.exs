@@ -1,9 +1,8 @@
-defmodule SurrealExTest.ConfigTest do
+defmodule SurrealExTest.SignTest do
   use ExUnit.Case
 
   alias SurrealExTest.Conn
-  alias SurrealEx.HTTPResponse
-
+  alias SurrealEx.HTTPAuth
 
   setup_all do
     Conn.sql("REMOVE TABLE user")
@@ -23,7 +22,7 @@ defmodule SurrealExTest.ConfigTest do
                     DEFINE FIELD user ON user TYPE string;
                     DEFINE FIELD pass ON user TYPE string;
                     DEFINE FIELD email ON user TYPE string;
-                    DEFINE FIELD role ON user TYPE string;
+                    DEFINE FIELD role ON user TYPE int;
                     --- define INDEX's
                     DEFINE INDEX idx_user ON user COLUMNS user UNIQUE;
 
@@ -50,67 +49,35 @@ defmodule SurrealExTest.ConfigTest do
 
   test "register", state do
     config = state.config
+    {:ok, _token} = HTTPAuth.register(config, "admin", "1234", "example@mail.com")
 
-    url = "#{config.uri}/signup"
-    headers = config._prepare.headers
-    options = []
-
-    query = %{
-      "ns" => config.ns ,
-      "db" => config.db ,
-      "sc" => "allusers",
+    user_register = %{
       "user" => "admin",
       "pass" => "1234",
       "email" => "example@mail.com"
     }
-    query_txt = Jason.encode!(query)
 
-    response = HTTPoison.post(url, query_txt , headers, options)
-      |> HTTPResponse.build()
-
-    IO.inspect response
-
-    response = HTTPoison.post(url, query_txt , headers, options)
-    |> HTTPResponse.build()
-
-    #IO.inspect response
+    response = HTTPAuth.register(config, user_register)
     assert {:error, :authentication_failed} == response
-
   end
 
+
   test "login", state do
-    IO.puts "Login"
     config = state.config
+    {:ok, token} = HTTPAuth.login(config, "admin", "1234")
 
-    url = "#{config.uri}/signin"
-    headers = config._prepare.headers
-      |> Keyword.delete(:Authorization)
-    options = []
+    {:ok, user} = HTTPAuth.get_user_by_token(config, token)
+    assert user["email"] == "example@mail.com"
+    assert user["role"] == 0
 
-    query = %{
-      "ns" => config.ns ,
-      "db" => config.db ,
-      "sc" => "allusers",
-      "user" => "admin",
-      "pass" => "1234",
-    }
-    query_txt = Jason.encode!(query)
-
-    response = HTTPoison.post(url, query_txt , headers, options)
-      |> HTTPResponse.build()
-    {:ok, token} = response
-
-
-    url = "#{config.uri}/sql"
-    headers = config._prepare.headers
-      |> Keyword.put(:Authorization, "Bearer " <> token)
-    options = []
-
-    query = "select * from user where id = $auth.id"
-    response = HTTPoison.post(url, query , headers, options)
-    |> HTTPResponse.build()
-
+    query = "UPDATE #{user["id"]} SET role = 10"
+    response = HTTPAuth.sql(config, query, token)
     IO.inspect response
+
+    {:ok, user} = HTTPAuth.get_user_by_token(config, token)
+    assert user["email"] == "example@mail.com"
+    assert user["role"] == 10
+
   end
 
 

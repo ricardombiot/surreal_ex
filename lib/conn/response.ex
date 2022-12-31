@@ -86,7 +86,7 @@ defmodule SurrealEx.Response do
   ## Example:
 
       iex> raw_body = "[{\\"time\\":\\"77.182µs\\",\\"status\\":\\"ERR\\",\\"detail\\":\\"Database record `team:valenciacf` already exists\\"}]"
-      iex> {:ok, response} = SurrealEx.Response.build_all(raw_body)
+      iex> {:ok, response} = SurrealEx.Response.build_all({:ok,raw_body})
       iex> response
       [
         %SurrealEx.Response{
@@ -98,20 +98,31 @@ defmodule SurrealEx.Response do
       ]
 
   """
-  def build_all(raw_body) do
+  def build_all({:ok,raw_body}) do
     Jason.decode!(raw_body)
     |> from_json_build_all_responses()
+  end
+  def build_all({:error,raw_body}) do
+    error_message = Jason.decode!(raw_body)
+   # IO.inspect error_message
+    case {error_message["code"], error_message["details"]} do
+      {403, "Authentication failed"} -> {:error, :authentication_failed}
+      {403, _} -> {:error, :forbidden}
+      _ -> {:error, error_message}
+    end
   end
 
   defp from_json_build_all_responses(json) when is_list(json) do
     responses = Enum.map(json, &new/1)
     {:ok, responses}
   end
+  defp from_json_build_all_responses(%{"code" => 200, "details" => "Authentication succeeded", "token" => token}) do
+    {:ok, token}
+  end
   defp from_json_build_all_responses(json) do
     IO.inspect json
     {:error, "Something wrong when we trying cast responses. Report it please."}
   end
-
 
   @doc """
   `all_status_ok?` reads all responses status searching that all will be "OK".
@@ -119,12 +130,12 @@ defmodule SurrealEx.Response do
   ## Example:
 
       iex> raw_body = "[{\\"time\\":\\"77.182µs\\",\\"status\\":\\"OK\\",\\"detail\\":\\"\\"}, {\\"time\\":\\"77.182µs\\",\\"status\\":\\"OK\\",\\"detail\\":\\"\\"}]"
-      iex> {:ok, response} = SurrealEx.Response.build_all(raw_body)
+      iex> {:ok, response} = SurrealEx.Response.build_all({:ok,raw_body})
       iex> SurrealEx.Response.all_status_ok?(response)
       true
 
       iex> raw_body = "[{\\"time\\":\\"77.182µs\\",\\"status\\":\\"ERR\\",\\"detail\\":\\"Database record `team:valenciacf` already exists\\"}, {\\"time\\":\\"77.182µs\\",\\"status\\":\\"OK\\",\\"detail\\":\\"\\"}]"
-      iex> {:ok, response} = SurrealEx.Response.build_all(raw_body)
+      iex> {:ok, response} = SurrealEx.Response.build_all({:ok,raw_body})
       iex> SurrealEx.Response.all_status_ok?(response)
       false
 

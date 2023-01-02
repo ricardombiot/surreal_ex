@@ -19,6 +19,7 @@ defmodule SurrealEx.Conn do
     quote do
 
       alias SurrealEx.Response
+      alias SurrealEx.HTTPAuth
 
       def config() do
         SurrealEx.Config.get_config(__MODULE__)
@@ -83,6 +84,14 @@ defmodule SurrealEx.Conn do
           sql(query)
         end)
       end
+
+      def register(user), do: HTTPAuth.register(config(), user)
+      def register(username, password, email), do: HTTPAuth.register(config(), username, password, email)
+      def register(username, password, email, role), do: HTTPAuth.register(config(), username, password, email, role)
+
+      def login(username, password), do: HTTPAuth.login(config(), username, password)
+
+      def get_user_by_token(token), do: HTTPAuth.get_user_by_token(config(), token)
 
     end
 

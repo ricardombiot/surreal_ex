@@ -3,6 +3,7 @@ defmodule SurrealEx.HTTPAuth do
   alias SurrealEx.HTTPResponse
   alias SurrealEx.UtilsJsonParser
 
+
   def register(config, username, password, email) do
     register(config, username, password, email, 0)
   end

@@ -129,7 +129,7 @@ DEFINE SCOPE allusers
 2. After you will be able to register new users using:
 
 ```elixir
-{:ok, _token} = SurrealEx.HTTPAuth.register(config, "admin", "1234", "example@mail.com")
+{:ok, _token} = Conn.register("admin", "1234", "example@mail.com")
 ```
 Or 
 ```elixir
@@ -141,18 +141,20 @@ user_register = %{
   "otherfield2" => ...
 }
 
-{:ok,_token} = SurrealEx.HTTPAuth.register(config, user_register)
+{:ok,_token} = Conn.register(user_register)
 ```
 
 3. You can login (and take token) with:
 
 ```elixir
-{:ok, token} = SurrealEx.HTTPAuth.login(config, "admin", "1234")
+{:ok, token} = Conn.login("admin", "1234")
 ```
 
 4. And restore information user with:
 
 ```elixir
-{:ok, user} = HTTPAuth.get_user_by_token(config, token)
+{:ok, user} = Conn.get_user_by_token(token)
 #assert user.email == "example@mail.com"
 ```
+
+[(Learn more on our docs.)](https://hexdocs.pm/surreal_ex/register_and_login.html)

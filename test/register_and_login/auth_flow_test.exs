@@ -2,7 +2,6 @@ defmodule SurrealExTest.AuthFlowTest do
   use ExUnit.Case
 
   alias SurrealExTest.Conn
-  alias SurrealEx.HTTPAuth
 
   setup_all do
     Conn.sql("REMOVE TABLE user")
@@ -85,17 +84,18 @@ defmodule SurrealExTest.AuthFlowTest do
   end
 
 
-  test "Using Auth.QueryFlow", state do
-    config = state.config
-    {:ok, token_customer} = HTTPAuth.register(config, "customer", "1234", "example@mail.com")
-    {:ok, token_admin} = HTTPAuth.register(config, "admin", "1234", "example@mail.com")
-    {:ok, user} = HTTPAuth.get_user_by_token(config, token_admin)
+  test "Using Auth.QueryFlow", _state do
+    {:ok, token_customer} = Conn.register("customer", "1234", "example@mail.com")
+    {:ok, _token_admin} = Conn.register("admin", "1234", "example@mail.com")
+
+    {:ok, token_admin} = Conn.login("admin", "1234")
+    {:ok, user} = Conn.get_user_by_token(token_admin)
 
     args = %{role: "admin", user_id: user.id}
     {:ok, user} = UpdateRoleFlow.run(args, token_admin)
     assert user["role"] == 30
 
-    {:ok, user} = HTTPAuth.get_user_by_token(config, token_admin)
+    {:ok, user} = Conn.get_user_by_token(token_admin)
     assert user.user == "admin"
     assert Map.get(user, "pass") == nil
     assert user.email == "example@mail.com"
@@ -105,7 +105,7 @@ defmodule SurrealExTest.AuthFlowTest do
     response = UpdateRoleFlow.run(args, token_customer)
     assert response == {:error, "not updated"}
 
-    {:ok, user} = HTTPAuth.get_user_by_token(config, token_admin)
+    {:ok, user} = Conn.get_user_by_token(token_admin)
     assert user.user == "admin"
     assert Map.get(user, "pass") == nil
     assert user.email == "example@mail.com"

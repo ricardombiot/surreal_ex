@@ -4,7 +4,7 @@ defmodule SurrealEx.MixProject do
   def project do
     [
       app: :surreal_ex,
-      version: "0.1.0-dev",
+      version: "0.2.0",
       elixir: "~> 1.12",
       description: description(),
       package: package(),
@@ -18,7 +18,8 @@ defmodule SurrealEx.MixProject do
         main: "readme", # The main page in the docs
         extras: ["README.md",
           "guide/quick_crud.md",
-          "guide/custom_queries.md"
+          "guide/custom_queries.md",
+          "guide/register_and_login.md"
         ],
         assets: "guide/assets"
       ]

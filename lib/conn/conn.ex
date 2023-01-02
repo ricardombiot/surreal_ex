@@ -19,6 +19,7 @@ defmodule SurrealEx.Conn do
     quote do
 
       alias SurrealEx.Response
+      alias SurrealEx.HTTPAuth
 
       def config() do
         SurrealEx.Config.get_config(__MODULE__)
@@ -32,12 +33,23 @@ defmodule SurrealEx.Conn do
         config()
         |> sql(query)
       end
+      def sql(query, token) when is_bitstring(query) and is_bitstring(token) do
+        config()
+        |> sql(query, token)
+      end
       def sql(config = %SurrealEx.Config{kind: :for_http}, query) do
         SurrealEx.HTTP.sql(config, query)
         |> if_only_one_response_catchit()
       end
+      def sql(config = %SurrealEx.Config{kind: :for_http}, query, token) do
+        SurrealEx.HTTPAuth.sql(config, query, token)
+        |> if_only_one_response_catchit()
+      end
       def sql(_config , _query) do
         {:error, "Please, review your configuration %SurrealEx.Config{...}."}
+      end
+      def sql(_config , _query, _token) do
+        {:error, "Please, review your configuration %SurrealEx.Config{...} or Token Authentication"}
       end
 
       defp if_only_one_response_catchit({:ok, [response]}) do
@@ -72,6 +84,14 @@ defmodule SurrealEx.Conn do
           sql(query)
         end)
       end
+
+      def register(user), do: HTTPAuth.register(config(), user)
+      def register(username, password, email), do: HTTPAuth.register(config(), username, password, email)
+      def register(username, password, email, role), do: HTTPAuth.register(config(), username, password, email, role)
+
+      def login(username, password), do: HTTPAuth.login(config(), username, password)
+
+      def get_user_by_token(token), do: HTTPAuth.get_user_by_token(config(), token)
 
     end
 

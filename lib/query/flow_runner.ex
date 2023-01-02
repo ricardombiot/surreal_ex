@@ -5,6 +5,11 @@ defmodule SurrealEx.Query.QueryFlowRunner do
     |> flow_optional_before(module)
     |> flow_query(module, conn_module)
   end
+  def run(module, conn_module, args, token) do
+    optional_filters(module, args)
+    |> flow_optional_before(module)
+    |> flow_query(module, conn_module, token)
+  end
 
   defp flow_optional_before({:ok, args}, module), do: optional_before(module, args)
   defp flow_optional_before(err, _module), do: err
@@ -15,6 +20,12 @@ defmodule SurrealEx.Query.QueryFlowRunner do
     |> optional_after(module)
   end
   defp flow_query(err, _module, _conn_module), do: err
+  defp flow_query({:ok, query_args}, module, conn_module, token) do
+    prepare_query(module, query_args)
+    |> exe_query(conn_module, token)
+    |> optional_after(module)
+  end
+  defp flow_query(err, _module, _conn_module, _token), do: err
 
 
   defp optional_filters(module, args) do
@@ -42,6 +53,12 @@ defmodule SurrealEx.Query.QueryFlowRunner do
     apply(conn_module, :sql, [query])
   end
   defp exe_query(_query, _conn_module) do
+    SurrealEx.Exception.query_should_be_string()
+  end
+  defp exe_query(query, conn_module, token) when is_bitstring(query) and is_bitstring(token) do
+    apply(conn_module, :sql, [query, token])
+  end
+  defp exe_query(_query, _conn_module, _token) do
     SurrealEx.Exception.query_should_be_string()
   end
 

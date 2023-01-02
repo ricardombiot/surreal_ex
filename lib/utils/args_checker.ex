@@ -15,7 +15,7 @@ defmodule SurrealEx.ArgsChecker do
       end
     end)
   end
-  def apply(args, filters) do
+  def apply(args, _filters) do
     #  Info message or Exception.
     {:ok, args}
   end

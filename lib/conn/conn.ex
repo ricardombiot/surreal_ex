@@ -32,12 +32,23 @@ defmodule SurrealEx.Conn do
         config()
         |> sql(query)
       end
+      def sql(query, token) when is_bitstring(query) and is_bitstring(token) do
+        config()
+        |> sql(query, token)
+      end
       def sql(config = %SurrealEx.Config{kind: :for_http}, query) do
         SurrealEx.HTTP.sql(config, query)
         |> if_only_one_response_catchit()
       end
+      def sql(config = %SurrealEx.Config{kind: :for_http}, query, token) do
+        SurrealEx.HTTPAuth.sql(config, query, token)
+        |> if_only_one_response_catchit()
+      end
       def sql(_config , _query) do
         {:error, "Please, review your configuration %SurrealEx.Config{...}."}
+      end
+      def sql(_config , _query, _token) do
+        {:error, "Please, review your configuration %SurrealEx.Config{...} or Token Authentication"}
       end
 
       defp if_only_one_response_catchit({:ok, [response]}) do

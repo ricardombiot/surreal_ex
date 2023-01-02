@@ -1,6 +1,7 @@
 defmodule SurrealEx.HTTPAuth do
 
   alias SurrealEx.HTTPResponse
+  alias SurrealEx.UtilsJsonParser
 
   def register(config, username, password, email) do
     register(config, username, password, email, 0)
@@ -55,6 +56,7 @@ defmodule SurrealEx.HTTPAuth do
       {:ok, [response]} ->
         result = response.result
           |> Map.delete("pass")
+          |> UtilsJsonParser.map_strkeys_to_atomkeys()
 
         {:ok, result}
       _ -> {:error, nil}

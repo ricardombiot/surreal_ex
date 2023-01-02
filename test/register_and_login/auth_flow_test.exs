@@ -1,4 +1,4 @@
-defmodule SurrealExTest.SignTest do
+defmodule SurrealExTest.AuthFlowTest do
   use ExUnit.Case
 
   alias SurrealExTest.Conn
@@ -47,44 +47,70 @@ defmodule SurrealExTest.SignTest do
     Conn.sql(install_query)
   end
 
-  test "register", state do
-    config = state.config
-    {:ok, _token} = HTTPAuth.register(config, "admin", "1234", "example@mail.com")
 
-    user_register = %{
-      "user" => "admin",
-      "pass" => "1234",
-      "email" => "example@mail.com"
-    }
+  defmodule UpdateRoleFlow do
+    use SurrealEx.Query,
+      conn: SurrealExTest.Conn
 
-    response = HTTPAuth.register(config, user_register)
-    assert {:error, :authentication_failed} == response
+    def filters(_args), do: [ ArgsChecker.required(:role), ArgsChecker.required(:user_id) ]
+
+    def before(args) do
+      args = Map.put(args,:role, prepare_role(args.role))
+      {:ok, args}
+    end
+    defp prepare_role(role) do
+      case role do
+        "notverified" -> 0
+        "user" -> 10
+        "moderator" -> 20
+        "admin" -> 30
+      end
+    end
+
+    def query(args) do
+      "UPDATE #{args.user_id} SET role = #{args.role}"
+    end
+
+    def ok(response) do
+      case response.result do
+        [] -> {:error, "not updated"}
+        user -> {:ok, user}
+      end
+    end
+
+    def error(_response) do
+      {:error, "not expected case"}
+    end
+
   end
 
 
-  test "login", state do
+  test "Using Auth.QueryFlow", state do
     config = state.config
-    {:ok, token} = HTTPAuth.login(config, "admin", "1234")
+    {:ok, token_customer} = HTTPAuth.register(config, "customer", "1234", "example@mail.com")
+    {:ok, token_admin} = HTTPAuth.register(config, "admin", "1234", "example@mail.com")
+    {:ok, user} = HTTPAuth.get_user_by_token(config, token_admin)
 
-    {:ok, user} = HTTPAuth.get_user_by_token(config, token)
-    assert user.email == "example@mail.com"
-    assert user.role == 0
+    args = %{role: "admin", user_id: user.id}
+    {:ok, user} = UpdateRoleFlow.run(args, token_admin)
+    assert user["role"] == 30
 
-    query = "UPDATE #{user.id} SET role = 10"
-    {:ok, [response]} = HTTPAuth.sql(config, query, token)
-    #IO.inspect response
-    user = response.result
-    assert user["user"] == "admin"
-    assert Map.get(user, "pass") != nil
-    assert user["email"] == "example@mail.com"
-    assert user["role"] == 10
-
-    {:ok, user} = HTTPAuth.get_user_by_token(config, token)
+    {:ok, user} = HTTPAuth.get_user_by_token(config, token_admin)
     assert user.user == "admin"
-    # Remove pass atribute.
     assert Map.get(user, "pass") == nil
     assert user.email == "example@mail.com"
-    assert user.role == 10
+    assert user.role == 30
+
+    args = %{role: "notverified", user_id: user.id}
+    response = UpdateRoleFlow.run(args, token_customer)
+    assert response == {:error, "not updated"}
+
+    {:ok, user} = HTTPAuth.get_user_by_token(config, token_admin)
+    assert user.user == "admin"
+    assert Map.get(user, "pass") == nil
+    assert user.email == "example@mail.com"
+    assert user.role == 30
+
   end
 
 end

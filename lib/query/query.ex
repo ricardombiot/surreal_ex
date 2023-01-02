@@ -19,6 +19,9 @@ defmodule SurrealEx.Query do
       def run(args) do
         SurrealEx.Query.QueryFlowRunner.run(__MODULE__, unquote(conn_module), args)
       end
+      def run(args, token) do
+        SurrealEx.Query.QueryFlowRunner.run(__MODULE__, unquote(conn_module), args, token)
+      end
 
     end
   end
